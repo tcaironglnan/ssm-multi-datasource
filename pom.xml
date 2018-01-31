@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ssm.cn</groupId>
-    <artifactId>ssm</artifactId>
+    <artifactId>ssm-multi-datasource</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>ssm Maven Webapp</name>
@@ -330,7 +330,7 @@
 
     <!-- 需要的插件 -->
     <build>
-        <finalName>ssm</finalName>
+        <finalName>ssm-multi-datasource</finalName>
         <pluginManagement>
             <plugins>
                 <!--maven的编译插件-->

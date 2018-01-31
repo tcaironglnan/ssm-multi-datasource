@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding= "UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--学生实体映射接口配置-->
+<mapper namespace="com.ssm.dao.StudentMapper">
+
+    <!--由于使用resultMap会报错，所以暂时不使用  后续补上-->
+    <!--<resultMap type="Student" id="studentMap">-->
+        <!--<result property="sname" column="sname"/>-->
+        <!--<result property="kecheng" column="kecheng"/>-->
+        <!--<result property="fenshu" column="fenshu"/>-->
+    <!--</resultMap>-->
+
+    <!--oracle按照学生姓名查询一条记录-->
+    <select id="findStudentByUserName" parameterType="com.ssm.model.Student" resultType="com.ssm.model.Student">
+        SELECT * FROM student WHERE sname=#{sname}
+    </select>
+
+    <!--获取学生数据列表-->
+    <select id="getList" resultType="com.ssm.model.Student">
+        SELECT * FROM student
+    </select>
+
+</mapper>

@@ -1,0 +1,11 @@
+# Package Files #
+*.jar
+*.war
+*.ear
+.idea/
+.gitosc/
+target/
+logs/
+*.class
+*.iml
+out/

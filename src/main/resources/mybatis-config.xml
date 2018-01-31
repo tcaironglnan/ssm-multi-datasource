@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!-- 配置映射类的别名 -->
+    <typeAliases>
+        <typeAlias alias="User" type="com.ssm.model.UserModel"/>
+    </typeAliases>
+
+    <!-- 配置Mapper文件的路径,接口Dao的实现 注：在idea中该配置文件不适用-->
+    <mappers>
+        <mapper resource="mapper/StudentMapper.xml"/>
+        <mapper resource="mapper/UserMapper.xml"/>
+    </mappers>
+</configuration>

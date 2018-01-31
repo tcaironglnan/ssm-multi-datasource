@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--配置扫描的包路径-->
+    <context:component-scan base-package="com.ssm">
+        <!--排除Controller包不扫描-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--配置/引入properties配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!-- 配置数据源 -->
+    <!--oracle-->
+    <bean id="dataSource_oracle" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <!--数据库的连接驱动-->
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <!--数据库的连接地址-->
+        <property name="url" value="${jdbc.url}"/>
+        <!--数据库的登录名-->
+        <property name="username" value="${jdbc.username}"/>
+        <!--数据库的登录密码-->
+        <property name="password" value="${jdbc.password}"/>
+
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <!-- 连接池最大数量 -->
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <!-- 连接池最大空闲 -->
+        <!--<property name="maxIdle" value="${jdbc.maxIdle}"/>-->
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+    </bean>
+
+    <!--mysql-->
+    <bean id="dataSource_mysql" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <!--数据库的连接驱动-->
+        <property name="driverClassName" value="${jdbc.m.driverClassName}"/>
+        <!--数据库的连接地址-->
+        <property name="url" value="${jdbc.m.url}"/>
+        <!--数据库的登录名-->
+        <property name="username" value="${jdbc.m.username}"/>
+        <!--数据库的登录密码-->
+        <property name="password" value="${jdbc.m.password}"/>
+
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <!-- 连接池最大数量 -->
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <!-- 连接池最大空闲 -->
+        <!--<property name="maxIdle" value="${jdbc.maxIdle}"/>-->
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+    </bean>
+
+    <!--配置使用的默认数据源和其它需要的数据源-->
+    <bean id="dynamicDataSource" class="com.ssm.config.predefined.DynamicDataSource">
+        <!--配置使用的目标数据库-->
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <!--配置write的数据库-->
+                <entry key="master" value-ref="dataSource_oracle"/>
+                <!--配置read的数据库-->
+                <entry key="slave" value-ref="dataSource_mysql"/>
+            </map>
+        </property>
+        <!--配置默认使用的数据库-->
+        <property name="defaultTargetDataSource" ref="dataSource_oracle"/>
+    </bean>
+
+    <!-- mybatis和spring完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dynamicDataSource"/>
+        <!-- 自动扫描mapping.xml文件，mapper文件夹处在resources文件夹中，如果处在java文件中的包，则使用mybatis-config.xml -->
+        <!--方式去<mapper resource="com/ssm/mapper/UserMapper.xml"/>则会报错，找不到对应的mapper.xml文件-->
+        <!--以上问题在idea中存在，似乎很多人使用eclipse是不存在这种问题的-->
+        <property name="mapperLocations" value="classpath*:mapper/*.xml"/>
+    </bean>
+
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--配置dao层包路径-->
+        <property name="basePackage" value="com.ssm.dao"/>
+        <!--引用sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <!-- (配置事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--事务对oracle数据库的管理-->
+        <property name="dataSource" ref="dataSource_oracle"/>
+        <!--事务对mysql的管理，后续完善-->
+    </bean>
+
+    <!-- (配置事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--配置数据库注解aop-->
+    <!--配置关注点的类-->
+    <bean id="multiDataSourceAspect" class="com.ssm.interceptor.DataSourceAspect"/>
+    <aop:config>
+        <!--引用配置关注点的bean id-->
+        <aop:aspect id="dataSourceAspect" ref="multiDataSourceAspect">
+            <aop:pointcut id="tx" expression="execution(* com.ssm.service..*.*(..))"/>
+            <!--aop的前置方法配置-->
+            <aop:before pointcut-ref="tx" method="before"/>
+            <!--aop的后置方法配置-->
+            <aop:after pointcut-ref="tx" method="after"/>
+        </aop:aspect>
+    </aop:config>
+</beans>

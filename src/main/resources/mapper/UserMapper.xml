@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding= "UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--用户实体映射接口配置-->
+<mapper namespace="com.ssm.dao.UserMapper">
+
+    <!--由于使用resultMap会报错，所以暂时不使用  后续补上-->
+    <!--<resultMap type="com.ssm.model.UserModel" id="userMap">-->
+        <!--<result property="userName" column="username"/>-->
+        <!--<result property="passWord" column="password"/>-->
+    <!--</resultMap>-->
+
+    <!--mysql按照用户名查询一条记录-->
+    <select id="findUserByUserName" parameterType="com.ssm.model.UserModel" resultType="com.ssm.model.UserModel">
+        SELECT * FROM face WHERE username=#{userName}
+    </select>
+
+    <!--查询用户数据列表-->
+    <select id="getList" resultType="com.ssm.model.UserModel">
+        SELECT * FROM face
+    </select>
+</mapper>

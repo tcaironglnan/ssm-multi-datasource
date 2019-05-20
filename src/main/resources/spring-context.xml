@@ -100,13 +100,26 @@
 
     <!-- (配置事务管理)transaction manager, use JtaTransactionManager for global tx -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--<bean id="transactionManager_oracle" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
         <!--事务对oracle数据库的管理-->
         <property name="dataSource" ref="dataSource_oracle"/>
-        <!--事务对mysql的管理，后续完善-->
+        <!--自定义事务名称-->
+        <qualifier value="datasource1Tx"/>
+    </bean>
+    <bean id="transactionManager_mysql" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--事务对mysql的管理->-->
+         <property name="dataSource" ref="dataSource_mysql"/>
+        <!--自定义事务名称-->
+        <qualifier value="datasource2Tx"/>
     </bean>
 
     <!-- (配置事务管理)transaction manager, use JtaTransactionManager for global tx -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!--事务管理1-->
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <!--事务管理2-->
+    <!--<tx:annotation-driven transaction-manager="transactionManager_mysql"/>-->
+    <!--不指定事务管理-->
+    <tx:annotation-driven />
 
     <!--配置数据库注解aop-->
     <!--配置关注点的类-->
